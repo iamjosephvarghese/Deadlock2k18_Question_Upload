@@ -114,26 +114,10 @@ public class Upload extends AppCompatActivity {
 
                             answer = input.toString();
 
-//                            flag = 0;
-//                            //check need here
-//                            for (int i = 0;i < imageList.size();i++) {
-//                                if (input.toString().equals(imageList.get(i).getImageId())){
-//
-//                                    flag = 1;
-//                                    Log.d("Found","image in db");
-//                                    break;
-//                                }
-//
-//                            }
-
-
-
 
                             Log.d("answer...on progress",input.toString());
-//                            dialog.getActionButton(DialogAction.NEUTRAL).setEnabled(true);
                             dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
                         }else if (input.toString().equals("")){
-//                            dialog.getActionButton(DialogAction.NEUTRAL).setEnabled(false);
                             dialog.getActionButton(DialogAction.POSITIVE).setEnabled(false);
                         }
 
@@ -143,21 +127,10 @@ public class Upload extends AppCompatActivity {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         Log.d("positive clicked","............");
-//                        Log.d("which",which.toString());
-
-//                        if (flag == 1){
-//                            dialog.dismiss();
-//                            showSnackBar();
-//                        }else{
-//                            Log.d("positive else",".......");
-
-
-
 
                             metadata = new StorageMetadata.Builder()
                                     .setContentType("image/jpg")
                                     .setCustomMetadata("Timestamp",new Date().toString())
-//                                    .setCustomMetadata("ImageId",imageId)
                                     .build();
 
 
@@ -183,26 +156,11 @@ public class Upload extends AppCompatActivity {
                             }
 
 
-
-//                        }
-
-
-
-
-
-
-
                     }
                 }).onNegative(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         Log.d("negative clicked","............");
-
-
-
-
-
-
 
 
 
@@ -213,15 +171,7 @@ public class Upload extends AppCompatActivity {
         dialog = builder1.build();
 
 
-
-
-
-
-
     }
-
-
-
 
 
 
@@ -231,12 +181,6 @@ public class Upload extends AppCompatActivity {
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent,"Select Image"),LOAD_IMAGE);
     }
-
-
-
-
-
-
 
 
 
@@ -276,11 +220,7 @@ public class Upload extends AppCompatActivity {
         }
 
 
-
-
     }
-
-
 
 
 
@@ -367,15 +307,9 @@ public class Upload extends AppCompatActivity {
                 //Toast.makeText(Home.this, "Image Uploaded", Toast.LENGTH_SHORT).show();
 
 
-//                                if (flag == 0) {
-
-//
-//
-//                imageDetails = new ImageDetails(imageId,taskSnapshot.getDownloadUrl().toString());
-//                dbHandler.addImage(imageDetails, userName);
-
-                String uploadId = mDatabaseRef.push().getKey();
-                mDatabaseRef.child(uploadId).setValue(imageDetails);
+//                TODO:add firestore push here
+//                String uploadId = mDatabaseRef.push().getKey();
+//                mDatabaseRef.child(uploadId).setValue(imageDetails);
 
                 uploadDialog.dismiss();
 //
@@ -384,14 +318,6 @@ public class Upload extends AppCompatActivity {
 
 
 //                Snackbar.make(findViewById(R.id.rootView),"Image Uploaded Successfully",Snackbar.LENGTH_SHORT).show();
-
-
-//                                }
-                //extra safety ? :p
-
-//                startActivity(backIntent);
-
-
 
 
             }
