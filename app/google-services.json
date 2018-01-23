@@ -1,0 +1,99 @@
+{
+  "project_info": {
+    "project_number": "222315734307",
+    "firebase_url": "https://tourist-23bb8.firebaseio.com",
+    "project_id": "tourist-23bb8",
+    "storage_bucket": "tourist-23bb8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:222315734307:android:102e6fb21b939949",
+        "android_client_info": {
+          "package_name": "rm.iamjosephvarghese.deadlock2k18"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "222315734307-6bihv8rtmeveeb7afk1v0njqvf4djr19.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "rm.iamjosephvarghese.deadlock2k18",
+            "certificate_hash": "e6f2ca7824b0a26de462cf837fcb6432353dd28a"
+          }
+        },
+        {
+          "client_id": "222315734307-c8g193rfvcc1aplthb8bhcil1d7fi8hc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdln3LVfKX4J0AGNpAxETTU51sZRMFwS4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "222315734307-c8g193rfvcc1aplthb8bhcil1d7fi8hc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:222315734307:android:961afc3cadcf0f5b",
+        "android_client_info": {
+          "package_name": "rm.iamjosephvarghese.deadlock2k18_question_upload"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "222315734307-o56fr9ft0vuiusu1llhu35kbva0jbvrs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "rm.iamjosephvarghese.deadlock2k18_question_upload",
+            "certificate_hash": "e6f2ca7824b0a26de462cf837fcb6432353dd28a"
+          }
+        },
+        {
+          "client_id": "222315734307-c8g193rfvcc1aplthb8bhcil1d7fi8hc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdln3LVfKX4J0AGNpAxETTU51sZRMFwS4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "222315734307-c8g193rfvcc1aplthb8bhcil1d7fi8hc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
