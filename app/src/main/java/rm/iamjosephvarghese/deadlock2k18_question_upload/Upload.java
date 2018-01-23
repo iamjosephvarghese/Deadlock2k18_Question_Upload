@@ -25,6 +25,8 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
@@ -34,24 +36,27 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Upload extends AppCompatActivity {
 
 
     private int STORAGE_PERMISSION_CODE = 23;
-    private int CAMERA_PERMISSION_CODE = 24;
 
 
     private StorageReference mStorageRef;
     private StorageMetadata metadata;
 
 
-    SharedPreferences sharedPreferences;
-    SharedPreferences.Editor editor;
+//    SharedPreferences sharedPreferences;
+//    SharedPreferences.Editor editor;
 
 
-    String answer;
+    String answer,downloadUrl;
 
     private int LOAD_IMAGE = 1;
     private int CHECK_IMAGE = 3;
@@ -60,6 +65,11 @@ public class Upload extends AppCompatActivity {
     private Uri uriPhoto;
     Uri uploadUri;
     private Bitmap bitmap;
+
+    String currentHash;
+
+    FirebaseFirestore db;
+    DocumentReference documentReference1,documentReference2;
 
 
     MaterialDialog.Builder builder,builder1;
@@ -70,7 +80,9 @@ public class Upload extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload);
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db = FirebaseFirestore.getInstance();
+        documentReference1 = db.collection("latest").document("updateMe");
+        documentReference2 = db.collection("q").document("questions");
 
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
@@ -110,9 +122,11 @@ public class Upload extends AppCompatActivity {
                         if(!input.toString().equals("")){
 
 
-                            Log.d("inside","checking duplicate");
 
                             answer = input.toString();
+
+//                            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+//                            byte[] hash = digest.digest(answer.getBytes(StandardCharsets.UTF_8));
 
 
                             Log.d("answer...on progress",input.toString());
@@ -169,6 +183,8 @@ public class Upload extends AppCompatActivity {
 
 
         dialog = builder1.build();
+
+        dialog.show();
 
 
     }
@@ -244,47 +260,29 @@ public class Upload extends AppCompatActivity {
     private void requestStoragePermission(){
 
         if (ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.READ_EXTERNAL_STORAGE)){
-            //If the user has denied the permission previously your code will come to this block
-            //Here you can explain why you need this permission
-            //Explain here why you need this permission
+
         }
 
-        //And finally ask for the permission
         ActivityCompat.requestPermissions(this,new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE},STORAGE_PERMISSION_CODE);
     }
 
-    //This method will be called when the user will tap on allow or deny
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
-        //Checking the request code of our request
         if(requestCode == STORAGE_PERMISSION_CODE){
 
             //If permission is granted
             if(grantResults.length >0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
 
                 //Displaying a toast
-                Toast.makeText(this,"Permission granted.Click Selfie Again.",Toast.LENGTH_LONG).show();
+//                Toast.makeText(this,"Permission granted.Click Selfie Again.",Toast.LENGTH_LONG).show();
             }else{
                 //Displaying another toast if permission is not granted
-                Toast.makeText(this,"Oops you just denied the permission",Toast.LENGTH_LONG).show();
+//                Toast.makeText(this,"Oops you just denied the permission",Toast.LENGTH_LONG).show();
             }
         }
 
 
-
-        if(requestCode == CAMERA_PERMISSION_CODE){
-
-            //If permission is granted
-            if(grantResults.length >0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-
-                //Displaying a toast
-                Toast.makeText(this,"Permission granted.Click Selfie Again.",Toast.LENGTH_LONG).show();
-            }else{
-                //Displaying another toast if permission is not granted
-                Toast.makeText(this,"Oops you just denied the permission",Toast.LENGTH_LONG).show();
-            }
-        }
     }
 
 
@@ -292,26 +290,72 @@ public class Upload extends AppCompatActivity {
 
 
     public void uploadImage(){
+        Log.d("Reached","uploadImage");
 
+
+
+        db = FirebaseFirestore.getInstance();
+        documentReference1 = db.collection("latest").document("updateMe");
+        documentReference2 = db.collection("q").document("questions");
+        Log.d("Reached","uploadImage2222");
 
 
         uploadDialog.show();
 
 
-        StorageReference sRef = mStorageRef.child("questionImages").child(imageId);
+        final StorageReference sRef = mStorageRef.child("questionImages");
 
-        sRef.putFile(uploadUri,metadata).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+//        ////////////
+
+        documentReference1.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                Log.d("Reached","ref1listener");
+                currentHash = documentSnapshot.get("currentHash").toString();
+                Log.d("currentHash",currentHash);
 
-                //Toast.makeText(Home.this, "Image Uploaded", Toast.LENGTH_SHORT).show();
+
+
+
+                sRef.putFile(uploadUri,metadata).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                        //Toast.makeText(Home.this, "Image Uploaded", Toast.LENGTH_SHORT).show();
+
+                        downloadUrl = taskSnapshot.getDownloadUrl().toString();
+                        Log.d("Uploading image",".......");
+
 
 
 //                TODO:add firestore push here
 //                String uploadId = mDatabaseRef.push().getKey();
 //                mDatabaseRef.child(uploadId).setValue(imageDetails);
 
-                uploadDialog.dismiss();
+
+                        Map<String,Object> data = new HashMap<>();
+                        data.put("photoURL",downloadUrl);
+
+
+                        Log.d("downloadURL",downloadUrl);
+
+
+                        documentReference2.collection("answerHashHere").document(currentHash).set(data).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                uploadDialog.dismiss();
+                                Log.d("push","success");
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.d("push","error");
+                            }
+                        });
+
+
+
+
 //
 
 //add rootView here
@@ -320,17 +364,36 @@ public class Upload extends AppCompatActivity {
 //                Snackbar.make(findViewById(R.id.rootView),"Image Uploaded Successfully",Snackbar.LENGTH_SHORT).show();
 
 
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                        uploadDialog.dismiss();
+
+//                Snackbar.make(findViewById(R.id.rootView),"Error Uploading Image",Snackbar.LENGTH_LONG).show();
+                        Log.d("onFaliure",e.toString());
+                    }
+                });
+
+
+
+
+
+
+
+
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
 
-                uploadDialog.dismiss();
-
-//                Snackbar.make(findViewById(R.id.rootView),"Error Uploading Image",Snackbar.LENGTH_LONG).show();
-                Log.d("onFaliure",e.toString());
             }
         });
+
+
+
+
 
 
 
