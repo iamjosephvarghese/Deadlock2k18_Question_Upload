@@ -23,8 +23,10 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -150,16 +152,7 @@ public class Upload extends AppCompatActivity {
 
 
 
-                        try{
-                            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-                            byte[] encodedhash = digest.digest(
-                                    answer.getBytes(Charset.forName("UTF-8")));
 
-
-
-                        }catch(NoSuchAlgorithmException e){
-//                            Inside catch
-                        }
 
 
 
@@ -336,7 +329,7 @@ public class Upload extends AppCompatActivity {
                 Log.d("previousHash",previousHash);
 
 
-
+//TODO:random id for each image entered into db
 
 
                 sRef.putFile(uploadUri,metadata).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -347,6 +340,39 @@ public class Upload extends AppCompatActivity {
 
                         downloadUrl = taskSnapshot.getDownloadUrl().toString();
                         Log.d("Uploading image",".......");
+
+                        String toBeHashed = downloadUrl + previousHash + answer;
+
+
+
+                        try{
+                            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                            byte[] outputHash = digest.digest(
+                                    toBeHashed.toLowerCase().getBytes(Charset.forName("UTF-8")));
+
+                            StringBuffer hexString = new StringBuffer();
+
+                            for (int i = 0; i < outputHash.length; i++) {
+                                String hex = Integer.toHexString(0xff & outputHash[i]);
+                                if(hex.length() == 1) hexString.append('0');
+                                hexString.append(hex);
+                            }
+
+//                            byte[] hash = generatedHash = digest.digest(
+//                                    toBeHashed.toLowerCase().getBytes(Charset.forName("UTF-8")));
+
+
+                            generatedHash = hexString.toString();
+                            Log.d("generatedHash",generatedHash);
+
+
+
+
+
+
+                        }catch(NoSuchAlgorithmException e){
+//                            Inside catch for NOSuchAlgorithException
+                        }
 
 
 
@@ -361,7 +387,7 @@ public class Upload extends AppCompatActivity {
 
                         Log.d("downloadURL",downloadUrl);
 
-//                          TODO:commented for batch
+//                          TODO:  commented for batch
 //                        documentReference2.collection(currentHash).document(previousHash).set(data).addOnSuccessListener(new OnSuccessListener<Void>() {
 //                            @Override
 //                            public void onSuccess(Void aVoid) {
@@ -374,7 +400,7 @@ public class Upload extends AppCompatActivity {
 //                                Log.d("push","error");
 //                            }
 //                        });
-//                         TODO:end of comment for batch
+//                         TODO:  end of comment for batch
 
 
                         WriteBatch batch = db.batch();
@@ -387,7 +413,7 @@ public class Upload extends AppCompatActivity {
                         Map<String,Object> nullData = new HashMap<>();
                         nullData.put("photoURL",null);
 
-                        DocumentReference generatedNull = db.collection("q").document("questions").collection("generatedHash").document(currentHash);
+                        DocumentReference generatedNull = db.collection("q").document("questions").collection(generatedHash).document(currentHash);
                         batch.set(generatedNull,nullData);
 
 
@@ -399,13 +425,29 @@ public class Upload extends AppCompatActivity {
                         batch.update(updateCurrent,"currentHash",generatedHash);
 
 
+//                        TODO: add levels and corresponding hashes in db
+
+
+                        batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d("batch","push success");
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.d("batch",e.toString());
+                            }
+                        });
+
+
 
 
 
 
 //
 
-//add rootView here
+//                  add rootView here
 
 
 //                Snackbar.make(findViewById(R.id.rootView),"Image Uploaded Successfully",Snackbar.LENGTH_SHORT).show();
