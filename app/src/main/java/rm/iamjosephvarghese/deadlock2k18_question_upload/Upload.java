@@ -353,28 +353,7 @@ public class Upload extends AppCompatActivity {
 
 
 
-//                        try{
-//                            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-//                            byte[] outputHash = digest.digest(
-//                                    toBeHashed.getBytes(Charset.forName("UTF-8")));
-////                                    toBeHashed.getBytes(StandardCharsets.UTF_8);
-//
-//
-//                            generatedHash = outputHash.toString();
-//
-////                            StringBuffer hexString = new StringBuffer();
-////
-////                            for (int i = 0; i < outputHash.length; i++) {
-////                                String hex = Integer.toHexString(0xff & outputHash[i]);
-////                                if(hex.length() == 1) hexString.append('0');
-////                                hexString.append(hex);
-////                            }
-//
-////                            byte[] hash = generatedHash = digest.digest(
-////                                    toBeHashed.toLowerCase().getBytes(Charset.forName("UTF-8")));
-//
-//
-////                            generatedHash = hexString.toString();
+
                             Log.d("generatedHash",generatedHash);
 //
 //
@@ -382,10 +361,6 @@ public class Upload extends AppCompatActivity {
 //
 //
 //
-//                        }catch(NoSuchAlgorithmException e){
-////                            Inside catch for NOSuchAlgorithException
-//                        }
-
 
 
 //                TODO:add firestore push here
