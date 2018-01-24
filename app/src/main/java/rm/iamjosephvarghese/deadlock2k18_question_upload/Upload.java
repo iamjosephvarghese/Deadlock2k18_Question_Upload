@@ -27,6 +27,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.common.hash.Hashing;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -341,38 +342,49 @@ public class Upload extends AppCompatActivity {
                         downloadUrl = taskSnapshot.getDownloadUrl().toString();
                         Log.d("Uploading image",".......");
 
-                        String toBeHashed = downloadUrl + previousHash + answer;
+                        String toBeHashed = answer + downloadUrl + currentHash;
+
+
+                        Log.d("tobehashed",toBeHashed);
+
+                        generatedHash = Hashing.sha256()
+                                .hashString(toBeHashed, Charset.forName("UTF-8"))
+                                .toString();
 
 
 
-                        try{
-                            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-                            byte[] outputHash = digest.digest(
-                                    toBeHashed.toLowerCase().getBytes(Charset.forName("UTF-8")));
-
-                            StringBuffer hexString = new StringBuffer();
-
-                            for (int i = 0; i < outputHash.length; i++) {
-                                String hex = Integer.toHexString(0xff & outputHash[i]);
-                                if(hex.length() == 1) hexString.append('0');
-                                hexString.append(hex);
-                            }
-
-//                            byte[] hash = generatedHash = digest.digest(
-//                                    toBeHashed.toLowerCase().getBytes(Charset.forName("UTF-8")));
-
-
-                            generatedHash = hexString.toString();
+//                        try{
+//                            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+//                            byte[] outputHash = digest.digest(
+//                                    toBeHashed.getBytes(Charset.forName("UTF-8")));
+////                                    toBeHashed.getBytes(StandardCharsets.UTF_8);
+//
+//
+//                            generatedHash = outputHash.toString();
+//
+////                            StringBuffer hexString = new StringBuffer();
+////
+////                            for (int i = 0; i < outputHash.length; i++) {
+////                                String hex = Integer.toHexString(0xff & outputHash[i]);
+////                                if(hex.length() == 1) hexString.append('0');
+////                                hexString.append(hex);
+////                            }
+//
+////                            byte[] hash = generatedHash = digest.digest(
+////                                    toBeHashed.toLowerCase().getBytes(Charset.forName("UTF-8")));
+//
+//
+////                            generatedHash = hexString.toString();
                             Log.d("generatedHash",generatedHash);
-
-
-
-
-
-
-                        }catch(NoSuchAlgorithmException e){
-//                            Inside catch for NOSuchAlgorithException
-                        }
+//
+//
+//
+//
+//
+//
+//                        }catch(NoSuchAlgorithmException e){
+////                            Inside catch for NOSuchAlgorithException
+//                        }
 
 
 
@@ -403,42 +415,53 @@ public class Upload extends AppCompatActivity {
 //                         TODO:  end of comment for batch
 
 
-                        WriteBatch batch = db.batch();
+//                        WriteBatch batch = db.batch();
 
 
                         DocumentReference questionURL = db.collection("q").document("questions").collection(currentHash).document(previousHash);
-                        batch.set(questionURL,data);
+//                        batch.set(questionURL,data);
+                        questionURL.set(data).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d("success","1");
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.d("error","1");
+                            }
+                        });
 
 
                         Map<String,Object> nullData = new HashMap<>();
                         nullData.put("photoURL",null);
 
                         DocumentReference generatedNull = db.collection("q").document("questions").collection(generatedHash).document(currentHash);
-                        batch.set(generatedNull,nullData);
+//                        batch.set(generatedNull,nullData);
 
 
                         DocumentReference updatePrevious = db.collection("latest").document("updateMe");
-                        batch.update(updatePrevious,"previousHash",currentHash);
+//                        batch.update(updatePrevious,"previousHash",currentHash);
 
 
                         DocumentReference updateCurrent = db.collection("latest").document("updateMe");
-                        batch.update(updateCurrent,"currentHash",generatedHash);
+//                        batch.update(updateCurrent,"currentHash",generatedHash);
 
 
 //                        TODO: add levels and corresponding hashes in db
 
 
-                        batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d("batch","push success");
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.d("batch",e.toString());
-                            }
-                        });
+//                        batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
+//                            @Override
+//                            public void onSuccess(Void aVoid) {
+//                                Log.d("batch","push success");
+//                            }
+//                        }).addOnFailureListener(new OnFailureListener() {
+//                            @Override
+//                            public void onFailure(@NonNull Exception e) {
+//                                Log.d("batch",e.toString());
+//                            }
+//                        });
 
 
 
