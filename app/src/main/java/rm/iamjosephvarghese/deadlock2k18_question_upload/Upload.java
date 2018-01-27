@@ -81,6 +81,8 @@ public class Upload extends AppCompatActivity {
     MaterialDialog.Builder builder,builder1;
     MaterialDialog dialog,uploadDialog;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -151,13 +153,6 @@ public class Upload extends AppCompatActivity {
 
 
 
-
-
-
-
-
-
-
                         metadata = new StorageMetadata.Builder()
                                     .setContentType("image/jpg")
                                     .setCustomMetadata("Timestamp",new Date().toString())
@@ -199,10 +194,7 @@ public class Upload extends AppCompatActivity {
 
 
 
-
-
     }
-
 
 
     private void showFileChooser(){
@@ -211,7 +203,6 @@ public class Upload extends AppCompatActivity {
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent,"Select Image"),LOAD_IMAGE);
     }
-
 
 
     @Override
@@ -252,8 +243,6 @@ public class Upload extends AppCompatActivity {
 
 
     }
-
-
 
 
     //We are calling this method to check the permission status
@@ -300,8 +289,6 @@ public class Upload extends AppCompatActivity {
 
     }
 
-
-
     public void uploadImage(){
         Log.d("Reached","uploadImage");
 
@@ -315,8 +302,8 @@ public class Upload extends AppCompatActivity {
 
         uploadDialog.show();
 
-
-        final StorageReference sRef = mStorageRef.child("questionImages");
+        String timestamp = new Date().toString();
+        final StorageReference sRef = mStorageRef.child("deadlock_questions/" +  timestamp);
 
 //        ////////////
 
@@ -414,13 +401,47 @@ public class Upload extends AppCompatActivity {
                         DocumentReference generatedNull = db.collection("q").document("questions").collection(generatedHash).document(currentHash);
 //                        batch.set(generatedNull,nullData);
 
+                        generatedNull.set(nullData).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d("success","2");
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.d("error","2");
+                            }
+                        });
+
 
                         DocumentReference updatePrevious = db.collection("latest").document("updateMe");
 //                        batch.update(updatePrevious,"previousHash",currentHash);
+                        updatePrevious.update("previousHash",currentHash).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d("success","3");
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.d("error","3");
+                            }
+                        });
 
 
                         DocumentReference updateCurrent = db.collection("latest").document("updateMe");
 //                        batch.update(updateCurrent,"currentHash",generatedHash);
+                        updateCurrent.update("currentHash",generatedHash).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d("success","4");
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.d("error","4");
+                            }
+                        });
 
 
 //                        TODO: add levels and corresponding hashes in db

@@ -25,6 +25,7 @@ dependencies {
     implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
     implementation 'com.android.support:design:26.1.0'
     implementation 'com.google.firebase:firebase-storage:11.8.0'
+    implementation 'com.firebase:firebase-client-android:2.5.2'
     implementation 'com.google.firebase:firebase-firestore:11.8.0'
     implementation 'com.google.guava:guava:23.6-android'
     testImplementation 'junit:junit:4.12'
@@ -32,6 +33,7 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:3.0.1') {
         exclude group: 'com.google.code.findbugs'
     }
+
 }
 
 
