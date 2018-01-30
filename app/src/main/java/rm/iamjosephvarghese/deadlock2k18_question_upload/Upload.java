@@ -85,14 +85,12 @@ public class Upload extends AppCompatActivity {
     Button add;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload);
 
         add = findViewById(R.id.add);
-
 
 
         db = FirebaseFirestore.getInstance();
@@ -116,7 +114,6 @@ public class Upload extends AppCompatActivity {
         uploadDialog = builder.build();
 
 
-
         builder1 = new MaterialDialog.Builder(Upload.this)
                 .title("Upload Image")
                 .content("Enter Your Choice")
@@ -130,7 +127,6 @@ public class Upload extends AppCompatActivity {
                     @Override
                     public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
                         if(!input.toString().equals("")){
-
 
 
                             answer = input.toString();
@@ -149,38 +145,16 @@ public class Upload extends AppCompatActivity {
                         Log.d("positive clicked","............");
 
 
-
-
                         metadata = new StorageMetadata.Builder()
                                     .setContentType("image/jpg")
                                     .setCustomMetadata("Timestamp",new Date().toString())
                                     .build();
-
-
-
-//                            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//
-//
-//                                if (isReadStorageAllowed()) {
-//                                    showFileChooser();
-//                                    return;
-//
-//                                }
-//
-//                                requestStoragePermission();
-//
-//                            }else{
-//                                showFileChooser();
-//                            }
-
 
                     }
                 }).onNegative(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         Log.d("negative clicked","............");
-
-
 
                     }
                 });
@@ -214,7 +188,6 @@ public class Upload extends AppCompatActivity {
 
 
     }
-
 
     private void showFileChooser(){
 
