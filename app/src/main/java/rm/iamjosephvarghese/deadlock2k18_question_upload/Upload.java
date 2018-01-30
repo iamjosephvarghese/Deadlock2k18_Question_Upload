@@ -19,6 +19,8 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.util.Base64;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -58,9 +60,6 @@ public class Upload extends AppCompatActivity {
     private StorageMetadata metadata;
 
 
-//    SharedPreferences sharedPreferences;
-//    SharedPreferences.Editor editor;
-
 
     String answer,downloadUrl;
 
@@ -68,7 +67,6 @@ public class Upload extends AppCompatActivity {
     private int CHECK_IMAGE = 3;
 
 
-    private Uri uriPhoto;
     Uri uploadUri;
     private Bitmap bitmap;
 
@@ -84,12 +82,18 @@ public class Upload extends AppCompatActivity {
     MaterialDialog.Builder builder,builder1;
     MaterialDialog dialog,uploadDialog;
 
+    Button add;
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload);
+
+        add = findViewById(R.id.add);
+
+
 
         db = FirebaseFirestore.getInstance();
         documentReference1 = db.collection("latest").document("updateMe");
@@ -184,7 +188,13 @@ public class Upload extends AppCompatActivity {
 
         dialog = builder1.build();
 
-        dialog.show();
+
+        add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.show();
+            }
+        });
 
 
 
@@ -215,11 +225,7 @@ public class Upload extends AppCompatActivity {
 
                 writeToFile(BitMapToString(bitmap),Upload.this);
                 Intent showImage = new Intent(Upload.this,ShowSelected.class);
-                //showImage.putExtra("imageBitmap",BitMapToString(bitmap));
                 startActivityForResult(showImage,CHECK_IMAGE);
-//                img.setImageBitmap(bitmap);
-                //dont show here ...show in a different activity
-
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -232,7 +238,7 @@ public class Upload extends AppCompatActivity {
                 uploadImage();
 
             }else if(resultCode == RESULT_CANCELED){
-                /////
+
             }
 
         }
@@ -267,14 +273,12 @@ public class Upload extends AppCompatActivity {
 
         if(requestCode == STORAGE_PERMISSION_CODE){
 
-            //If permission is granted
             if(grantResults.length >0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
 
-                //Displaying a toast
-//                Toast.makeText(this,"Permission granted.Click Selfie Again.",Toast.LENGTH_LONG).show();
+
             }else{
-                //Displaying another toast if permission is not granted
-//                Toast.makeText(this,"Oops you just denied the permission",Toast.LENGTH_LONG).show();
+
+
             }
         }
 
@@ -304,8 +308,10 @@ public class Upload extends AppCompatActivity {
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 Log.d("Reached","ref1listener");
                 level = documentSnapshot.get("level").toString();
+                Log.d("level",level);
                 levelInt = Integer.parseInt(level);
-                levelIntNext = levelInt++;
+                Log.d("leveInt",levelInt.toString());
+                levelIntNext = levelInt + 1;
                 Log.d("nextLevel",levelIntNext.toString());
 
                 currentHash = documentSnapshot.get("currentHash").toString();
@@ -313,8 +319,6 @@ public class Upload extends AppCompatActivity {
                 Log.d("currentHash",currentHash);
                 Log.d("previousHash",previousHash);
 
-
-//              TODO:   random id for each image entered into db
 
 
                 sRef.putFile(uploadUri,metadata).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -348,23 +352,6 @@ public class Upload extends AppCompatActivity {
 
                         Log.d("downloadURL",downloadUrl);
 
-//                          TODO:  commented for batch
-
-//                        documentReference2.collection(currentHash).document(previousHash).set(data).addOnSuccessListener(new OnSuccessListener<Void>() {
-//                            @Override
-//                            public void onSuccess(Void aVoid) {
-//                                uploadDialog.dismiss();
-//                                Log.d("push","success");
-//                            }
-//                        }).addOnFailureListener(new OnFailureListener() {
-//                            @Override
-//                            public void onFailure(@NonNull Exception e) {
-//                                Log.d("push","error");
-//                            }
-//                        });
-
-//                         TODO:  end of comment for batch
-
 
                         WriteBatch batch = db.batch();
 
@@ -373,81 +360,27 @@ public class Upload extends AppCompatActivity {
                         batch.update(questionURL,"photoURL",downloadUrl);
 
 
-//                        questionURL.set(data).addOnSuccessListener(new OnSuccessListener<Void>() {
-//                            @Override
-//                            public void onSuccess(Void aVoid) {
-//                                Log.d("success","1");
-//                            }
-//                        }).addOnFailureListener(new OnFailureListener() {
-//                            @Override
-//                            public void onFailure(@NonNull Exception e) {
-//                                Log.d("error","1");
-//                            }
-//                        });
-
 
                         Map<String,Object> nullData = new HashMap<>();
                         nullData.put("photoURL",null);
-                        nullData.put("level",levelIntNext);
+                        nullData.put("level",levelInt + 1);
 
                         DocumentReference generatedNull = db.collection("q").document("questions").collection(generatedHash).document(currentHash);
                         batch.set(generatedNull,nullData);
 
-//                        generatedNull.set(nullData).addOnSuccessListener(new OnSuccessListener<Void>() {
-//                            @Override
-//                            public void onSuccess(Void aVoid) {
-//                                Log.d("success","2");
-//                            }
-//                        }).addOnFailureListener(new OnFailureListener() {
-//                            @Override
-//                            public void onFailure(@NonNull Exception e) {
-//
-//                                Log.d("error","2");
-//
-//                            }
-//                        });
 
 
                         DocumentReference updatePrevious = db.collection("latest").document("updateMe");
                         batch.update(updatePrevious,"previousHash",currentHash);
-//                        updatePrevious.update("previousHash",currentHash).addOnSuccessListener(new OnSuccessListener<Void>() {
-//                            @Override
-//                            public void onSuccess(Void aVoid) {
-//                                Log.d("success","3");
-//                            }
-//                        }).addOnFailureListener(new OnFailureListener() {
-//                            @Override
-//                            public void onFailure(@NonNull Exception e) {
-//                                Log.d("error","3");
-//                            }
-//                        });
 
 
                         final DocumentReference updateCurrent = db.collection("latest").document("updateMe");
                         batch.update(updateCurrent,"currentHash",generatedHash);
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-                        batch.update(updateCurrent,"level",levelIntNext);
+                        batch.update(updateCurrent,"level",levelInt + 1);
 
-
-//                        updateCurrent.update("currentHash",generatedHash).addOnSuccessListener(new OnSuccessListener<Void>() {
-//                            @Override
-//                            public void onSuccess(Void aVoid) {
-//                                Log.d("success","4");
-//                            }
-//                        }).addOnFailureListener(new OnFailureListener() {
-//                            @Override
-//                            public void onFailure(@NonNull Exception e) {
-//                                Log.d("error","4");
-//                            }
-//                        });
-
-
-
-
-//                        TODO: add levels and corresponding hashes in db
 
 
                         batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
