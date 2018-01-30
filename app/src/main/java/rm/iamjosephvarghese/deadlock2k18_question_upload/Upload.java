@@ -73,6 +73,9 @@ public class Upload extends AppCompatActivity {
     private Bitmap bitmap;
 
     String currentHash,previousHash,generatedHash;
+    String level;
+
+    Integer levelInt,levelIntNext;
 
     FirebaseFirestore db;
     DocumentReference documentReference1,documentReference2;
@@ -105,17 +108,8 @@ public class Upload extends AppCompatActivity {
                 .progressIndeterminateStyle(true)
                 .cancelable(false);
 
+
         uploadDialog = builder.build();
-
-
-
-
-
-
-
-//        byte[] encodedhash = digest.digest(
-//                originalString.getBytes(StandardCharsets.UTF_8));
-
 
 
 
@@ -198,10 +192,12 @@ public class Upload extends AppCompatActivity {
 
 
     private void showFileChooser(){
+
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent,"Select Image"),LOAD_IMAGE);
+
     }
 
 
@@ -245,22 +241,18 @@ public class Upload extends AppCompatActivity {
     }
 
 
-    //We are calling this method to check the permission status
+
     private boolean isReadStorageAllowed() {
-        //Getting the permission status
         int result = ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE);
 
-        //If permission is granted returning true
         if (result == PackageManager.PERMISSION_GRANTED)
             return true;
 
-        //If permission is not granted returning false
         return false;
     }
 
 
 
-    //Requesting permission
     private void requestStoragePermission(){
 
         if (ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.READ_EXTERNAL_STORAGE)){
@@ -311,13 +303,18 @@ public class Upload extends AppCompatActivity {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 Log.d("Reached","ref1listener");
+                level = documentSnapshot.get("level").toString();
+                levelInt = Integer.parseInt(level);
+                levelIntNext = levelInt++;
+                Log.d("nextLevel",levelIntNext.toString());
+
                 currentHash = documentSnapshot.get("currentHash").toString();
                 previousHash = documentSnapshot.get("previousHash").toString();
                 Log.d("currentHash",currentHash);
                 Log.d("previousHash",previousHash);
 
 
-//TODO:random id for each image entered into db
+//              TODO:   random id for each image entered into db
 
 
                 sRef.putFile(uploadUri,metadata).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -340,28 +337,19 @@ public class Upload extends AppCompatActivity {
 
 
 
-
                             Log.d("generatedHash",generatedHash);
-//
-//
-//
-//
-//
-//
 
-
-//                TODO:add firestore push here
-//                String uploadId = mDatabaseRef.push().getKey();
-//                mDatabaseRef.child(uploadId).setValue(imageDetails);
 
 
                         Map<String,Object> data = new HashMap<>();
                         data.put("photoURL",downloadUrl);
 
 
+
                         Log.d("downloadURL",downloadUrl);
 
 //                          TODO:  commented for batch
+
 //                        documentReference2.collection(currentHash).document(previousHash).set(data).addOnSuccessListener(new OnSuccessListener<Void>() {
 //                            @Override
 //                            public void onSuccess(Void aVoid) {
@@ -374,103 +362,108 @@ public class Upload extends AppCompatActivity {
 //                                Log.d("push","error");
 //                            }
 //                        });
+
 //                         TODO:  end of comment for batch
 
 
-//                        WriteBatch batch = db.batch();
+                        WriteBatch batch = db.batch();
 
 
                         DocumentReference questionURL = db.collection("q").document("questions").collection(currentHash).document(previousHash);
-//                        batch.set(questionURL,data);
-                        questionURL.set(data).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d("success","1");
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.d("error","1");
-                            }
-                        });
+                        batch.update(questionURL,"photoURL",downloadUrl);
 
 
-                        Map<String,Object> nullData = new HashMap<>();
-                        nullData.put("photoURL",null);
-
-                        DocumentReference generatedNull = db.collection("q").document("questions").collection(generatedHash).document(currentHash);
-//                        batch.set(generatedNull,nullData);
-
-                        generatedNull.set(nullData).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d("success","2");
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.d("error","2");
-                            }
-                        });
-
-
-                        DocumentReference updatePrevious = db.collection("latest").document("updateMe");
-//                        batch.update(updatePrevious,"previousHash",currentHash);
-                        updatePrevious.update("previousHash",currentHash).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d("success","3");
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.d("error","3");
-                            }
-                        });
-
-
-                        DocumentReference updateCurrent = db.collection("latest").document("updateMe");
-//                        batch.update(updateCurrent,"currentHash",generatedHash);
-                        updateCurrent.update("currentHash",generatedHash).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d("success","4");
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.d("error","4");
-                            }
-                        });
-
-
-//                        TODO: add levels and corresponding hashes in db
-
-
-//                        batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
+//                        questionURL.set(data).addOnSuccessListener(new OnSuccessListener<Void>() {
 //                            @Override
 //                            public void onSuccess(Void aVoid) {
-//                                Log.d("batch","push success");
+//                                Log.d("success","1");
 //                            }
 //                        }).addOnFailureListener(new OnFailureListener() {
 //                            @Override
 //                            public void onFailure(@NonNull Exception e) {
-//                                Log.d("batch",e.toString());
+//                                Log.d("error","1");
+//                            }
+//                        });
+
+
+                        Map<String,Object> nullData = new HashMap<>();
+                        nullData.put("photoURL",null);
+                        nullData.put("level",levelIntNext);
+
+                        DocumentReference generatedNull = db.collection("q").document("questions").collection(generatedHash).document(currentHash);
+                        batch.set(generatedNull,nullData);
+
+//                        generatedNull.set(nullData).addOnSuccessListener(new OnSuccessListener<Void>() {
+//                            @Override
+//                            public void onSuccess(Void aVoid) {
+//                                Log.d("success","2");
+//                            }
+//                        }).addOnFailureListener(new OnFailureListener() {
+//                            @Override
+//                            public void onFailure(@NonNull Exception e) {
+//
+//                                Log.d("error","2");
+//
+//                            }
+//                        });
+
+
+                        DocumentReference updatePrevious = db.collection("latest").document("updateMe");
+                        batch.update(updatePrevious,"previousHash",currentHash);
+//                        updatePrevious.update("previousHash",currentHash).addOnSuccessListener(new OnSuccessListener<Void>() {
+//                            @Override
+//                            public void onSuccess(Void aVoid) {
+//                                Log.d("success","3");
+//                            }
+//                        }).addOnFailureListener(new OnFailureListener() {
+//                            @Override
+//                            public void onFailure(@NonNull Exception e) {
+//                                Log.d("error","3");
+//                            }
+//                        });
+
+
+                        final DocumentReference updateCurrent = db.collection("latest").document("updateMe");
+                        batch.update(updateCurrent,"currentHash",generatedHash);
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+                        batch.update(updateCurrent,"level",levelIntNext);
+
+
+//                        updateCurrent.update("currentHash",generatedHash).addOnSuccessListener(new OnSuccessListener<Void>() {
+//                            @Override
+//                            public void onSuccess(Void aVoid) {
+//                                Log.d("success","4");
+//                            }
+//                        }).addOnFailureListener(new OnFailureListener() {
+//                            @Override
+//                            public void onFailure(@NonNull Exception e) {
+//                                Log.d("error","4");
 //                            }
 //                        });
 
 
 
 
+//                        TODO: add levels and corresponding hashes in db
 
 
-//
-
-//                  add rootView here
-
-
-//                Snackbar.make(findViewById(R.id.rootView),"Image Uploaded Successfully",Snackbar.LENGTH_SHORT).show();
-
+                        batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d("batch","Push Success");
+                                uploadDialog.dismiss();
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.d("batch","Push Error");
+                                Log.d("batch",e.toString());
+                                uploadDialog.dismiss();
+                            }
+                        });
 
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -479,15 +472,9 @@ public class Upload extends AppCompatActivity {
 
                         uploadDialog.dismiss();
 
-//                Snackbar.make(findViewById(R.id.rootView),"Error Uploading Image",Snackbar.LENGTH_LONG).show();
                         Log.d("onFaliure",e.toString());
                     }
                 });
-
-
-
-
-
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -495,7 +482,6 @@ public class Upload extends AppCompatActivity {
 
             }
         });
-
     }
 
 
