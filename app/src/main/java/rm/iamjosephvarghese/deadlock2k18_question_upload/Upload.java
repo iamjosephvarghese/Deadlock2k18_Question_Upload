@@ -155,6 +155,21 @@ public class Upload extends AppCompatActivity {
                                     .setCustomMetadata("Timestamp",new Date().toString())
                                     .build();
 
+
+                        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+
+                            if (isReadStorageAllowed()) {
+                                showFileChooser();
+                                return;
+                            }
+
+                            requestStoragePermission();
+
+                        }else{
+                            showFileChooser();
+                        }
+
                     }
                 }).onNegative(new MaterialDialog.SingleButtonCallback() {
                     @Override
@@ -173,19 +188,7 @@ public class Upload extends AppCompatActivity {
             public void onClick(View view) {
 
 
-                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
-
-                    if (isReadStorageAllowed()) {
-                        showFileChooser();
-                        return;
-                    }
-
-                    requestStoragePermission();
-
-                }else{
-                    showFileChooser();
-                }
 
                 dialog.show();
             }
