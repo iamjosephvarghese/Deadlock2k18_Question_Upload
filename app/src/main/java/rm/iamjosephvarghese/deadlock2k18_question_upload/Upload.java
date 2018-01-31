@@ -30,6 +30,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.common.hash.Hashing;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -91,6 +93,9 @@ public class Upload extends AppCompatActivity {
         setContentView(R.layout.activity_upload);
 
         add = findViewById(R.id.add);
+
+
+
 
 
         db = FirebaseFirestore.getInstance();
@@ -375,6 +380,19 @@ public class Upload extends AppCompatActivity {
                             @Override
                             public void onSuccess(Void aVoid) {
                                 Log.d("batch","Push Success");
+
+
+                                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                                DatabaseReference realRef = database.getReference("answers");
+
+
+                                realRef.child(levelInt.toString()).setValue(answer).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Log.d("realtime","push success");
+                                    }
+                                });
+
                                 uploadDialog.dismiss();
                             }
                         }).addOnFailureListener(new OnFailureListener() {
