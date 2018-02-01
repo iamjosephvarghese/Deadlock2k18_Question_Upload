@@ -372,7 +372,6 @@ public class Upload extends AppCompatActivity {
                         batch.set(generatedNull,nullData);
 
 
-
                         DocumentReference updatePrevious = db.collection("latest").document("updateMe");
                         batch.update(updatePrevious,"previousHash",currentHash);
 
@@ -381,9 +380,7 @@ public class Upload extends AppCompatActivity {
                         batch.update(updateCurrent,"currentHash",generatedHash);
 
 
-
                         batch.update(updateCurrent,"level",levelInt + 1);
-
 
 
                         batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -434,7 +431,6 @@ public class Upload extends AppCompatActivity {
     }
 
 
-
     private void writeToFile(String data,Context context) {
         try {
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("config.txt", Context.MODE_PRIVATE));
@@ -445,7 +441,6 @@ public class Upload extends AppCompatActivity {
             Log.e("Exception", "File write failed: " + e.toString());
         }
     }
-
 
 
     public String BitMapToString(Bitmap bitmap){

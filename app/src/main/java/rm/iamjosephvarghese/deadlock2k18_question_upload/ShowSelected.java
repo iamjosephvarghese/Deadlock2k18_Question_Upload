@@ -36,13 +36,8 @@ public class ShowSelected extends AppCompatActivity {
         cross = findViewById(R.id.cross);
         tick = findViewById(R.id.tick);
 
-
-        //Intent collectBitmap = getIntent();
-        //bitmapString = collectBitmap.getStringExtra("imageBitmap");
         bitmapString = readFromFile(ShowSelected.this);
         img.setImageBitmap(StringToBitMap(bitmapString));
-
-
 
 
         tick.setOnClickListener(new View.OnClickListener() {
@@ -53,8 +48,6 @@ public class ShowSelected extends AppCompatActivity {
                 finish();
             }
         });
-
-
 
         cross.setOnClickListener(new View.OnClickListener() {
             @Override
