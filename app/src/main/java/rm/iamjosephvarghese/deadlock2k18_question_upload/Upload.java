@@ -17,6 +17,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -86,6 +87,8 @@ public class Upload extends AppCompatActivity {
 
     Button add;
 
+    String lowerCase;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,7 +137,11 @@ public class Upload extends AppCompatActivity {
                         if(!input.toString().equals("")){
 
 
-                            answer = input.toString();
+                            lowerCase = input.toString().toLowerCase();
+                            String[] parts = lowerCase.split(" ");
+
+
+                            answer = TextUtils.join("",parts);
 
                             Log.d("answer...on progress",input.toString());
                             dialog.getActionButton(DialogAction.POSITIVE).setEnabled(true);
